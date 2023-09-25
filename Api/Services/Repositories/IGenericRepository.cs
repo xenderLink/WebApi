@@ -1,4 +1,4 @@
-namespace Store.Repositories;
+namespace Store.Services.Repositories;
 
 public interface IGenericRepository<T> 
         where T : class

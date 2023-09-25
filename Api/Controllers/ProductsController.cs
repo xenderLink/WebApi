@@ -1,7 +1,7 @@
-using System.Text.Json;
 using AutoMapper;
 using Store.Extensions;
-using Store.Repositories;
+using Store.Services;
+using Store.Services.Repositories;
 using Store.Models.DTO;
 using Store.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +13,13 @@ namespace Store.Controllers;
 public sealed class ProductsController : ControllerBase
 {
     private readonly IProductRepository repository;
+    private readonly IMessageProducer _producer;
     private readonly IMapper _mapper;
 
-    public ProductsController(IProductRepository rep, IMapper mapper)
+    public ProductsController(IProductRepository rep, IMessageProducer producer, IMapper mapper)
     {
         repository = rep;
+        _producer = producer;
         _mapper = mapper;
     }
     
@@ -31,7 +33,9 @@ public sealed class ProductsController : ControllerBase
         {
             var product = await repository.GetByIdAsync(id, cancellationToken);       
 
-            return product is null ? NotFound("No such product") : Ok(_mapper.Map<Product, ProductDto>(product));               
+            return product is null 
+                ? NotFound("No such product") 
+                : Ok(_mapper.Map<Product, ProductDto>(product));               
         }
         catch (OperationCanceledException)
         {

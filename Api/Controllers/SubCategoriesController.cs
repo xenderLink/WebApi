@@ -1,5 +1,5 @@
 using AutoMapper;
-using Store.Repositories;
+using Store.Services.Repositories;
 using Store.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Store.Models.Entities;
@@ -30,7 +30,9 @@ public sealed class SubCategoriesController : ControllerBase
         {
             var category = await _repository.GetByIdAsync(id, cancellationToken);
 
-            return category is null ? NotFound("No such subcategory") : Ok(_mapper.Map<SubCategory, SubCatDto>(category));
+            return category is null 
+                ? NotFound("No such subcategory") 
+                : Ok(_mapper.Map<SubCategory, SubCatDto>(category));
         }
         catch (OperationCanceledException)
         {

@@ -1,6 +1,6 @@
 using Store.Models.Entities;
 
-namespace Store.Repositories;
+namespace Store.Services.Repositories;
 
 public interface IProductRepository : IGenericRepository<Product>
 {

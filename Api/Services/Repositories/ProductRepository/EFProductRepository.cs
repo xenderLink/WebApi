@@ -1,10 +1,9 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Store.Data;
-using Store.Models.DTO;
 using Store.Models.Entities;
 
-namespace Store.Repositories;
+namespace Store.Services.Repositories;
 
 internal sealed class ProductRepository : IProductRepository
 {
@@ -25,7 +24,7 @@ internal sealed class ProductRepository : IProductRepository
     }
 
     public async Task<int> GetCategoryId(string category, CancellationToken cancellationToken) =>
-        await _context.sub_categories.Where(c => c.Name == category).Select(c => c.Id).FirstOrDefaultAsync((cancellationToken)); 
+        await _context.sub_categories.Where(c => c.Name == category).Select(c => c.Id).FirstOrDefaultAsync(cancellationToken); 
     
     public async Task<IEnumerable<Product>> GetByCategoryAsync(int id, CancellationToken cancellationToken) =>
         await _context.products.Where(p => p.Category.Id == id).ToListAsync(cancellationToken);
