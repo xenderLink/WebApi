@@ -31,11 +31,19 @@ public sealed class ProductsController : ControllerBase
     {
         try
         {
-            var product = await repository.GetByIdAsync(id, cancellationToken);       
+            var product = await repository.GetByIdAsync(id, cancellationToken);
 
-            return product is null 
-                ? NotFound("No such product") 
-                : Ok(_mapper.Map<Product, ProductDto>(product));               
+            
+
+            if (product is null)
+                return NotFound("No such product"); 
+            
+            var productDto = _mapper.Map<Product, ProductDto>(product);
+
+             _producer.SendingMessage<ProductDto>(productDto);
+
+             return Ok(productDto);
+
         }
         catch (OperationCanceledException)
         {

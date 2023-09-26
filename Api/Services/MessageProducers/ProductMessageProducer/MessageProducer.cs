@@ -26,6 +26,5 @@ public sealed class MessageProducer : IMessageProducer
         var body = Encoding.UTF8.GetBytes(jsonString);
 
         channel.BasicPublish("", "products", body: body);
-
     }
 }
