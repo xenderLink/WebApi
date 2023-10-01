@@ -70,9 +70,14 @@ public sealed class ProductsController : ControllerBase
             
             var products = await repository.GetByCategoryAsync(categoryId, cancellationToken);
 
-            return products.Count() is 0 
-                ? NotFound("No products with this category yet") 
-                : Ok(_mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products));
+            if (!products.Any())
+                return  NotFound("No products with this category yet");
+
+            var productDtos = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
+
+            _producer.SendingMessage<IEnumerable<ProductDto>>(productDtos); 
+            
+            return Ok(productDtos);
         }
         catch (OperationCanceledException)
         {
@@ -94,9 +99,14 @@ public sealed class ProductsController : ControllerBase
         {
             var products = await repository.GetAllAsync(cancellationToken);
 
-            return products.Count() is 0 
-                ? NotFound("The database has no products yet") 
-                : Ok(_mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products));
+            if (!products.Any())
+                return NotFound("The database has no products yet");
+
+            var productDtos = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
+
+            _producer.SendingMessage<IEnumerable<ProductDto>>(productDtos); 
+
+            return Ok(productDtos);
         }
         catch (OperationCanceledException)
         {
@@ -134,6 +144,8 @@ public sealed class ProductsController : ControllerBase
             }
             
             await repository.CreateAsync(product, cancellationToken);
+
+            _producer.SendingMessage<Product>(product);
 
             return new JsonResult("Product's been created") { StatusCode = 201 };
         }
@@ -180,6 +192,8 @@ public sealed class ProductsController : ControllerBase
 
             await repository.UpdateAsync(product, cancellationToken);
 
+            _producer.SendingMessage<Product>(product);
+
             return Ok("Product's been updated");         
         }
         catch (OperationCanceledException)
@@ -206,6 +220,8 @@ public sealed class ProductsController : ControllerBase
                 return NotFound("No such product");
 
             await repository.DeleteAsync(id, cancellationToken);
+
+            _producer.SendingMessage<Product>(product);
 
             return Ok("Product's been deleted");
         }
